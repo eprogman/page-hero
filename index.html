@@ -46,8 +46,8 @@
 
     <script>
 
-        const API_URL= 'https://api-hero-rest.onrender.com/superhero || http://localhost:3000';
-        
+        const API_URL = window.location.hostname === "localhost" ? "http://localhost:3000" : "https://api-hero-rest.onrender.com/superhero";
+
         // Search
         const buscar = document.getElementById('buscar');
         const inicio = document.getElementById('inicio');

@@ -19,7 +19,7 @@
         </ul>
     </header>
     <form id="loginForm">
-        <input type="text" id="user" placeholder="Usuario">
+        <input type="text" id="username" placeholder="Usuario">
         <input type="password" id="password" placeholder="Password">
         <button type="submit">Login</button>
     </form>
@@ -70,11 +70,11 @@
 
 
         async function login() {
-            const user = document.getElementById('user').value
+            const username = document.getElementById('username').value
             const password = document.getElementById('password').value
 
             // Validar que los campos no estén vacíos
-            if (!user || !password) {
+            if (!username || !password) {
                 alert('Por favor completa usuario y contraseña')
                 return
             }
@@ -85,7 +85,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ user, password }),
+                    body: JSON.stringify({ username, password }),
                     credentials: 'include'
                 })
 
@@ -94,7 +94,7 @@
                 if (response.ok && data.success) {
                     console.log('✅ Login correcto:', data.message)
                     // Limpiar campos
-                    document.getElementById('user').value = ''
+                    document.getElementById('username').value = ''
                     document.getElementById('password').value = ''
                     // Cargar superhéroes después del login exitoso
                     await getSuperhero()

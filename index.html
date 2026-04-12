@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Superhero</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+    <header>
+        <ul class="search">
+            <li><a href="javascript:void(0);" id="inicio">Inicio</a></li>
+            <li><label for="search">Buscar:</label><input type="text" name="search" id="buscar"></li>
+            <li><button id="good">Buenos</button></li>
+            <li><Button id="bad">Malos</Button></li>
+        </ul>
+    </header>
+    <form id="loginForm">
+        <input type="text" id="user" placeholder="Usuario">
+        <input type="password" id="password" placeholder="Password">
+        <button type="submit">Login</button>
+    </form>
+    <main>
+
+    </main>
+    <footer class="pagination">
+        <button id="prev" style="display: flex; width: 150px; align-items: center; gap: 20px;">
+            <h3>Prev</h3>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 320 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                <path fill="#d31212"
+                    d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z" />
+            </svg>
+        </button>
+        <button id="next" style="display: flex; width: 150px; align-items: center; gap: 20px;">
+            <svg xmlns=" http://www.w3.org/2000/svg"
+                viewBox="0 0 320 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                <path fill="#c21414"
+                    d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z" />
+            </svg>
+            <h3>Next</h3>
+        </button>
+    </footer>
+
+    <script>
+
+        const API_URL= 'http://localhost:3000';
+        
+        // Search
+        const buscar = document.getElementById('buscar');
+        const inicio = document.getElementById('inicio');
+        
+        // good & bad 
+        const good = document.getElementById('good');
+        const bad = document.getElementById('bad');
+
+        //Pagination
+        let valor = 1
+        let filtroActual = null // Almacenar filtro actual (null, 'good', 'bad')
+        const prev = document.getElementById('prev')
+        const next = document.getElementById('next')
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault() // 🔥 evita recargar la página
+            await login()
+        })
+
+
+        async function login() {
+            const user = document.getElementById('user').value
+            const password = document.getElementById('password').value
+
+            // Validar que los campos no estén vacíos
+            if (!user || !password) {
+                alert('Por favor completa usuario y contraseña')
+                return
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user, password }),
+                    credentials: 'include'
+                })
+
+                const data = await response.json()
+
+                if (response.ok && data.success) {
+                    console.log('✅ Login correcto:', data.message)
+                    // Limpiar campos
+                    document.getElementById('user').value = ''
+                    document.getElementById('password').value = ''
+                    // Cargar superhéroes después del login exitoso
+                    await getSuperhero()
+                } else {
+                    console.error('❌ Error login:', data.message)
+                    alert('Error: ' + data.message)
+                }
+            } catch (error) {
+                console.error('❌ Error en la solicitud:', error)
+                alert('Error al conectar con el servidor')
+            }
+        }
+
+        async function getSuperhero() {
+
+            const superhero = await fetch(`${API_URL}/superhero?page=1&limit=15`, {
+                 credentials: 'include' // ⭐ envía la cookie automáticamente
+            });
+            const data = await superhero.json();
+
+            // mostrar
+            const html = data.map(hero => {
+                return `
+            <article>
+                <h1>"${hero.name}" </h2>
+                <h2>"Nombre completo: ${hero.biography.fullName}"</h2>
+                <h2>"Editora: ${hero.biography.publisher}"</h2>
+                <img src="${hero.images.lg}" alt="${hero.name}">
+                <table>
+                    <tr>
+                    <th><h2>Alineación</h2></th>
+                    <th><h2>Inteligencia</h2></th>
+                    <th><h2>Velocidad</h2></th>
+                    <th><h2>Fuerza</h2></th>
+                    <th><h2>Nivel de combate</h2></th>
+                    </tr>
+                    <tr>
+                    <td><h2>"${hero.biography.alignment}"</h2></td>
+                    <td><h2>"${hero.powerstats.intelligence}"</h2></td>
+                    <td><h2>"${hero.powerstats.speed}"</h2></td>
+                    <td><h2>"${hero.powerstats.power}"</h2></td>
+                    <td><h2>"${hero.powerstats.combat}"</h2></td>
+                    </tr>
+                </table>
+            </article>
+            `
+            }).join('')
+
+            document.querySelector('main').innerHTML = html
+
+            // paginacion
+            prev.addEventListener('click', () => {
+                if (valor > 0 && valor < 39) {
+                    valor--
+                    valor = valor === 0 ? 1 : valor
+                    pagination(valor)
+                }
+            })
+
+            next.addEventListener('click', () => {
+                if (valor > 0 && valor < 39) {
+                    valor++
+                    valor = valor === 39 ? 38 : valor
+                    pagination(valor)
+                }
+
+            })
+
+            buscar.addEventListener('change', (e) => {
+                const name = e.target.value
+                buscarHero(name)
+
+            })
+
+            good.addEventListener('click', () => {
+                alineacion('good')
+            })
+            
+            bad.addEventListener('click', () => {
+                alineacion('bad')
+            })
+
+            inicio.addEventListener('click', () => {
+                filtroActual = null
+                valor = 1
+                getSuperhero()
+            })
+
+
+        }
+
+
+        async function pagination(valor) {
+            let url = `${API_URL}/superhero?page=${valor}&limit=15`
+            
+            // Si hay filtro activo, agregarlo a la URL
+            if (filtroActual) {
+                url += `&alineacion=${filtroActual}`
+            }
+
+            const response = await fetch(url, {
+                credentials: 'include' // ⭐ envía la cookie automáticamente
+            });
+            const superhero = await response.json();
+            
+
+            // mostrar
+            const html = superhero.map(hero => {
+                return `
+                <article>
+                <h1>"${hero.name}" </h2>
+                <h2>"Nombre completo: ${hero.biography.fullName}"</h2>
+                <h2>"Editora: ${hero.biography.publisher}"</h2>
+                <img src="${hero.images.lg}" alt="${hero.name}">
+                <table>
+                    <tr>
+                    <th><h2>Alineación</h2></th>
+                    <th><h2>Inteligencia</h2></th>
+                    <th><h2>Velocidad</h2></th>
+                    <th><h2>Fuerza</h2></th>
+                    <th><h2>Nivel de combate</h2></th>
+                    </tr>
+                    <tr>
+                    <td><h2>"${hero.biography.alignment}"</h2></td>
+                    <td><h2>"${hero.powerstats.intelligence}"</h2></td>
+                    <td><h2>"${hero.powerstats.speed}"</h2></td>
+                    <td><h2>"${hero.powerstats.power}"</h2></td>
+                    <td><h2>"${hero.powerstats.combat}"</h2></td>
+                    </tr>
+                </table>
+            </article>
+            `
+            }).join('')
+
+            document.querySelector('main').innerHTML = html
+
+            }
+
+        async function buscarHero(name) {
+            const response = await fetch(`${API_URL}/superhero/${name}`, {
+                credentials: 'include' // ⭐ envía la cookie automáticamente
+            })
+            const heroes = await response.json()
+
+            const html2 = heroes.map(superh => {
+                return `<article>
+                <h1>"${superh.name}" </h2>
+                <h2>"Nombre completo: ${superh.biography.fullName}"</h2>
+                <h2>"Editora: ${superh.biography.publisher}"</h2>
+                <img src="${superh.images.lg}" alt="${superh.name}">
+                <table>
+                    <tr>
+                    <th><h2>Alineación</h2></th>
+                    <th><h2>Inteligencia</h2></th>
+                    <th><h2>Velocidad</h2></th>
+                    <th><h2>Fuerza</h2></th>
+                    <th><h2>Nivel de combate</h2></th>
+                    </tr>
+                    <tr>
+                    <td><h2>"${superh.biography.alignment}"</h2></td>
+                    <td><h2>"${superh.powerstats.intelligence}"</h2></td>
+                    <td><h2>"${superh.powerstats.speed}"</h2></td>
+                    <td><h2>"${superh.powerstats.power}"</h2></td>
+                    <td><h2>"${superh.powerstats.combat}"</h2></td>
+                    </tr>
+                </table>
+            </article>`
+            }).join('')
+
+            document.querySelector('main').innerHTML = html2
+
+        }
+
+
+
+        async function alineacion(linea) {
+            valor = 1; // Reiniciar a página 1
+            filtroActual = linea; // Guardar el filtro actual
+            
+            const response = await fetch(`${API_URL}/superhero?page=${valor}&limit=15&alineacion=${linea}`, {
+                credentials: 'include' // ⭐ envía la cookie automáticamente
+            })
+            const result = await response.json()
+
+            const html3 = result.map(alin => {  
+                return `<article>
+                <h1>"${alin.name}" </h2>
+                <h2>"Nombre completo: ${alin.biography.fullName}"</h2>
+                <h2>"Editora: ${alin.biography.publisher}"</h2>
+                <img src="${alin.images.lg}" alt="${alin.name}">
+                <table>
+                    <tr>
+                    <th><h2>Alineación</h2></th>
+                    <th><h2>Inteligencia</h2></th>
+                    <th><h2>Velocidad</h2></th>
+                    <th><h2>Fuerza</h2></th>
+                    <th><h2>Nivel de combate</h2></th>
+                    </tr>
+                    <tr>
+                    <td><h2>"${alin.biography.alignment}"</h2></td>
+                    <td><h2>"${alin.powerstats.intelligence}"</h2></td>
+                    <td><h2>"${alin.powerstats.speed}"</h2></td>
+                    <td><h2>"${alin.powerstats.power}"</h2></td>
+                    <td><h2>"${alin.powerstats.combat}"</h2></td>
+                    </tr>
+                </table>
+            </article>`
+
+            }).join('')
+            document.querySelector('main').innerHTML = html3
+
+
+        }
+
+    </script>
+
+</body>
+
+</html>

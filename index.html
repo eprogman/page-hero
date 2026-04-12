@@ -97,7 +97,7 @@
                     document.getElementById('user').value = ''
                     document.getElementById('password').value = ''
                     // Cargar superhéroes después del login exitoso
-                    await getSuperhero()
+                    getSuperhero()
                 } else {
                     console.error('❌ Error login:', data.message)
                     alert('Error: ' + data.message)

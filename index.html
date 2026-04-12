@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Superhero</title>
-    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="./css/styles.css">
 </head>
 
@@ -47,7 +47,7 @@
 
     <script>
 
-        const API_URL = window.location.hostname === "localhost" ? "http://localhost:3000" : "https://api-hero-rest.onrender.com";
+        const API_URL = window.location.hostname === "127.0.0.1" ? "http://localhost:3000" : "https://api-hero-rest.onrender.com";
 
         // Search
         const buscar = document.getElementById('buscar');
@@ -90,7 +90,7 @@
                 })
 
                 const data = await response.json()
-
+                
                 if (response.ok && data.success) {
                     console.log('✅ Login correcto:', data.message)
                     // Limpiar campos
@@ -112,7 +112,7 @@
 
             const superhero = await fetch(`${API_URL}/superhero?page=1&limit=15`, {
                  method: 'GET',
-                 credentials: 'include' // ⭐ envía la cookie automáticamente
+                 credentials: "include" // ⭐ envía la cookie automáticamente
             });
             const data = await superhero.json();
 
@@ -197,6 +197,7 @@
             }
 
             const response = await fetch(url, {
+                method: 'GET',
                 credentials: 'include' // ⭐ envía la cookie automáticamente
             });
             const superhero = await response.json();
@@ -236,6 +237,7 @@
 
         async function buscarHero(name) {
             const response = await fetch(`${API_URL}/superhero/${name}`, {
+                method: 'GET',
                 credentials: 'include' // ⭐ envía la cookie automáticamente
             })
             const heroes = await response.json()
@@ -276,6 +278,7 @@
             filtroActual = linea; // Guardar el filtro actual
             
             const response = await fetch(`${API_URL}/superhero?page=${valor}&limit=15&alineacion=${linea}`, {
+                
                 credentials: 'include' // ⭐ envía la cookie automáticamente
             })
             const result = await response.json()

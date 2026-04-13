@@ -9,12 +9,13 @@ body {
     padding: 0;
     box-sizing: inherit;
     font-size: 62.5%;
-    background-color: black;
+    background-color: skyblue;
 
 }
 
 header {
-    color: white;
+    color:white;
+
 }
 
 main {
@@ -40,12 +41,18 @@ img {
     max-width: 100%;
 }
 
+section {
+    background: white;
+    padding: 20px;
+}
+
 .search {
     display: flex;
     justify-content: center;
-    margin: 10px;
     align-items: center;
     height: 100px;
+
+
 }
 
 .search li {
@@ -70,6 +77,7 @@ img {
 
     font-weight: bold;
 }
+
 
 .pagination {
     display: flex;

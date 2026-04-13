@@ -110,10 +110,7 @@
 
         async function getSuperhero() {
 
-            const superhero = await fetch(`${API_URL}/superhero?page=1&limit=15`, {
-                 method: 'GET',
-                 credentials: 'include' // ⭐ envía la cookie automáticamente
-            });
+            const superhero = await fetch(`${API_URL}/superhero?page=1&limit=15`, {method: 'GET',credentials: 'include'});
             
             const data = await superhero.json();
 

@@ -23,6 +23,9 @@
         <input type="password" id="password" placeholder="Password" style="height: 30px;">
         <button type="submit" style="font-weight: bold; width: 50%; margin: auto; height: 30px;">Login</button><br>
     </form>
+    <div id="welcome" style="display:none; text-align:center;">
+        <h2>Bienvenido</h2>
+    </div>      
     <main>
 
     </main>
@@ -96,6 +99,10 @@
                     // Limpiar campos
                     document.getElementById('user').value = ''
                     document.getElementById('password').value = ''
+                    // Ocultar el formulario
+                    document.getElementById("loginForm").style.display = "none";
+
+                    document.getElementById("welcome").style.display = "block";
                     // Cargar superhéroes después del login exitoso
                     await getSuperhero()
                 } else {
